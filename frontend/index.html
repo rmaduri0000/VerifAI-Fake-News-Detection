@@ -36,6 +36,10 @@
         </div>
       </div>
       <div class="nav-actions">
+        <a href="#globalEvaluationSection" class="btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
+          <span>📊</span>
+          <span>Model Evaluation & ROC</span>
+        </a>
         <a href="https://github.com/rmaduri0000/VerifAI-Fake-News-Detection" target="_blank" rel="noopener noreferrer" class="btn-github">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
@@ -180,14 +184,15 @@
         </div>
       </div>
 
-      <!-- Deep Analysis Tabs -->
+      <!-- Deep Analysis Tabs in Verification Output -->
       <div class="glass-card" style="padding: 1.5rem;">
         
         <nav class="tab-navigation">
           <button type="button" class="tab-btn active" data-tab="tabFact">🌐 Live Fact Evidence</button>
-          <button type="button" class="tab-btn" data-tab="tabML">🧠 ML Vocabulary Signals</button>
+          <button type="button" class="tab-btn" data-tab="tabConfusionROC">📉 Confusion Matrix & ROC</button>
+          <button type="button" class="tab-btn" data-tab="tabEvolution">📈 Model Evolution</button>
+          <button type="button" class="tab-btn" data-tab="tabML">🧠 Vocabulary Signals</button>
           <button type="button" class="tab-btn" data-tab="tabLIME">🧪 LIME Feature Heatmap</button>
-          <button type="button" class="tab-btn" data-tab="tabBenchmark">📊 Model Benchmarks</button>
         </nav>
 
         <!-- Tab 1: Fact Evidence -->
@@ -197,7 +202,239 @@
           </div>
         </div>
 
-        <!-- Tab 2: ML Signals -->
+        <!-- Tab 2: Confusion Matrix & ROC Curve -->
+        <div class="tab-pane" id="tabConfusionROC">
+          <div style="margin-bottom: 1.25rem;">
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; color: #38bdf8;">
+              Model Evaluation: Confusion Matrix & ROC Curve (Test Set: 7,820 Articles)
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary);">
+              Performance on stratified 20% holdout test dataset (3,581 Fake, 4,239 Real) evaluated on the champion Voting Classifier.
+            </p>
+          </div>
+
+          <!-- KPI Cards -->
+          <div class="kpi-badge-grid" id="evalKpiGrid">
+            <div class="kpi-card">
+              <div class="kpi-label">Overall Accuracy</div>
+              <div class="kpi-value" style="color: #4ade80;">99.18%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Precision</div>
+              <div class="kpi-value" style="color: #38bdf8;">98.99%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Recall (Sensitivity)</div>
+              <div class="kpi-value" style="color: #818cf8;">99.50%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">F1-Score</div>
+              <div class="kpi-value" style="color: #c084fc;">99.25%</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">ROC AUC</div>
+              <div class="kpi-value" style="color: #fbbf24;">0.9998</div>
+            </div>
+          </div>
+
+          <!-- Confusion Matrix & ROC Interactive Side-by-Side -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+            <!-- Interactive Confusion Matrix -->
+            <div class="cm-container">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">
+                  📉 Confusion Matrix (Interactive)
+                </h4>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">N = 7,820</span>
+              </div>
+
+              <div class="cm-matrix-wrapper">
+                <div></div>
+                <div class="cm-header">Pred Fake</div>
+                <div class="cm-header">Pred Real</div>
+
+                <div class="cm-header vertical">Actual Fake</div>
+                <div class="cm-cell correct-fake" title="True Negative: Fake news correctly detected">
+                  <span class="cm-cell-count">3,538</span>
+                  <span class="cm-cell-pct">98.80%</span>
+                  <span class="cm-cell-tag">True Negative</span>
+                </div>
+                <div class="cm-cell error-cell" title="False Positive: Fake news misclassified as Real">
+                  <span class="cm-cell-count">43</span>
+                  <span class="cm-cell-pct">1.20%</span>
+                  <span class="cm-cell-tag">False Positive</span>
+                </div>
+
+                <div class="cm-header vertical">Actual Real</div>
+                <div class="cm-cell error-cell" title="False Negative: Real news missed as Fake">
+                  <span class="cm-cell-count">21</span>
+                  <span class="cm-cell-pct">0.50%</span>
+                  <span class="cm-cell-tag">False Negative</span>
+                </div>
+                <div class="cm-cell correct-real" title="True Positive: Real news correctly verified">
+                  <span class="cm-cell-count">4,218</span>
+                  <span class="cm-cell-pct">99.50%</span>
+                  <span class="cm-cell-tag">True Positive</span>
+                </div>
+              </div>
+
+              <div style="font-size: 0.8rem; color: var(--text-secondary); text-align: center; margin-top: 0.5rem;">
+                Fake Detection: <strong>98.80%</strong> &bull; Real Detection: <strong>99.50%</strong>
+              </div>
+            </div>
+
+            <!-- Interactive ROC Curve Visualizer -->
+            <div class="roc-chart-wrapper">
+              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 0.8rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">
+                  📈 ROC Curve (AUC = 0.9998)
+                </h4>
+                <span style="font-size: 0.75rem; color: #4ade80; font-weight: 600;">Near-Perfect</span>
+              </div>
+
+              <!-- SVG Visual ROC Curve -->
+              <svg class="roc-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+                <!-- Grid background -->
+                <rect x="35" y="15" width="270" height="190" fill="rgba(15, 23, 42, 0.4)" stroke="rgba(255,255,255,0.06)" rx="4"/>
+                <line x1="35" y1="110" x2="305" y2="110" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3,3"/>
+                <line x1="170" y1="15" x2="170" y2="205" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3,3"/>
+
+                <!-- 45-degree Chance Diagonal (Random Guessing) -->
+                <line x1="35" y1="205" x2="305" y2="15" stroke="rgba(148, 163, 184, 0.4)" stroke-dasharray="4,4" stroke-width="1.5"/>
+
+                <!-- High-Performance ROC Curve (Steep rise to (0,1) then flat) -->
+                <!-- AUC area fill -->
+                <polygon points="35,205 38,20 305,20 305,205" fill="rgba(56, 189, 248, 0.12)"/>
+                <!-- Curve line -->
+                <polyline points="35,205 37,30 45,22 80,20 180,20 305,20" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+
+                <!-- Operating Point dot (FPR=1.2%, TPR=99.5%) -->
+                <circle cx="39" cy="22" r="5" fill="#f43f5e" stroke="#ffffff" stroke-width="1.5"/>
+
+                <!-- Axes -->
+                <line x1="35" y1="205" x2="305" y2="205" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+                <line x1="35" y1="15" x2="35" y2="205" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+
+                <!-- Axis Labels -->
+                <text x="170" y="228" fill="#94a3b8" font-size="10" text-anchor="middle">False Positive Rate (FPR)</text>
+                <text x="12" y="115" fill="#94a3b8" font-size="10" text-anchor="middle" transform="rotate(-90 12,115)">True Positive Rate</text>
+                <text x="35" y="218" fill="#64748b" font-size="9" text-anchor="middle">0.0</text>
+                <text x="305" y="218" fill="#64748b" font-size="9" text-anchor="middle">1.0</text>
+                <text x="25" y="208" fill="#64748b" font-size="9" text-anchor="end">0.0</text>
+                <text x="25" y="22" fill="#64748b" font-size="9" text-anchor="end">1.0</text>
+              </svg>
+
+              <div class="roc-stats-bar">
+                <div class="roc-stat-item">AUC: <strong>0.9998</strong></div>
+                <div class="roc-stat-item">Sensitivity: <strong>99.50%</strong></div>
+                <div class="roc-stat-item">Specificity: <strong>98.80%</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Matplotlib Plot Renderers -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+            <div style="background: rgba(10, 14, 24, 0.6); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
+              <h5 style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.6rem;">
+                Matplotlib Confusion Matrix Heatmap
+              </h5>
+              <img src="/static/assets/confusion_matrix.png" alt="Confusion Matrix Heatmap" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-subtle);" loading="lazy">
+            </div>
+            <div style="background: rgba(10, 14, 24, 0.6); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
+              <h5 style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.6rem;">
+                Matplotlib ROC Characteristic Curve
+              </h5>
+              <img src="/static/assets/roc_curve.png" alt="Matplotlib ROC Curve" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-subtle);" loading="lazy">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Model Evolution -->
+        <div class="tab-pane" id="tabEvolution">
+          <div style="margin-bottom: 1.25rem;">
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; color: #38bdf8;">
+              Model Evolution & Benchmarks (Experiment Progression)
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--text-secondary);">
+              Step-by-step performance comparison across all machine learning architectures tested during development.
+            </p>
+          </div>
+
+          <div class="evolution-card">
+            <table class="evolution-table">
+              <thead>
+                <tr>
+                  <th>Phase</th>
+                  <th>Model Architecture</th>
+                  <th>Category</th>
+                  <th>Accuracy</th>
+                  <th>Precision</th>
+                  <th>Recall</th>
+                  <th>F1-Score</th>
+                  <th>Key Feature / Notes</th>
+                </tr>
+              </thead>
+              <tbody id="evolutionTableBody">
+                <!-- Dynamically rendered or static fallback -->
+                <tr>
+                  <td><span class="evolution-stage-badge">1</span></td>
+                  <td><strong>Multinomial Naive Bayes</strong></td>
+                  <td><span style="color: var(--text-muted); font-size: 0.8rem;">Probabilistic Baseline</span></td>
+                  <td><strong style="color: #94a3b8;">94.13%</strong></td>
+                  <td>94.68%</td>
+                  <td>94.48%</td>
+                  <td>94.58%</td>
+                  <td style="color: var(--text-muted); font-size: 0.8rem;">Fast word-frequency baseline; limited by feature independence assumption.</td>
+                </tr>
+                <tr>
+                  <td><span class="evolution-stage-badge">2</span></td>
+                  <td><strong>Logistic Regression</strong></td>
+                  <td><span style="color: var(--text-muted); font-size: 0.8rem;">Linear Classifier</span></td>
+                  <td><strong style="color: #38bdf8;">98.62%</strong></td>
+                  <td>98.07%</td>
+                  <td>99.41%</td>
+                  <td>98.73%</td>
+                  <td style="color: var(--text-muted); font-size: 0.8rem;">High efficiency in high-dimensional 7,000 TF-IDF sparse space.</td>
+                </tr>
+                <tr>
+                  <td><span class="evolution-stage-badge">3</span></td>
+                  <td><strong>Random Forest</strong></td>
+                  <td><span style="color: var(--text-muted); font-size: 0.8rem;">Ensemble (Bagging)</span></td>
+                  <td><strong style="color: #818cf8;">99.08%</strong></td>
+                  <td>98.56%</td>
+                  <td>99.76%</td>
+                  <td>99.16%</td>
+                  <td style="color: var(--text-muted); font-size: 0.8rem;">100 decision trees; captures non-linear semantic token relationships.</td>
+                </tr>
+                <tr>
+                  <td><span class="evolution-stage-badge">4</span></td>
+                  <td><strong>Linear SVM (Calibrated)</strong></td>
+                  <td><span style="color: var(--text-muted); font-size: 0.8rem;">Max-Margin Hyperplane</span></td>
+                  <td><strong style="color: #a78bfa;">99.28%</strong></td>
+                  <td>99.13%</td>
+                  <td>99.55%</td>
+                  <td>99.34%</td>
+                  <td style="color: var(--text-muted); font-size: 0.8rem;">Maximum margin separator; Platt sigmoid calibrated for soft probabilities.</td>
+                </tr>
+                <tr class="champion-row">
+                  <td><span class="evolution-stage-badge" style="background: rgba(34, 197, 94, 0.25); color: #4ade80;">5</span></td>
+                  <td>
+                    <strong>Voting Ensemble</strong>
+                    <span class="champion-tag">Champion</span>
+                  </td>
+                  <td><span style="color: #4ade80; font-size: 0.8rem;">Soft Voting Ensemble</span></td>
+                  <td><strong style="color: #4ade80; font-size: 1.05rem;">99.18%</strong></td>
+                  <td style="color: #4ade80;">98.99%</td>
+                  <td style="color: #4ade80;">99.50%</td>
+                  <td style="color: #4ade80;">99.25%</td>
+                  <td style="color: #86efac; font-size: 0.8rem;">Combines LR + Calibrated Linear SVC + Random Forest for balanced, robust predictions.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 4: ML Vocabulary Signals -->
         <div class="tab-pane" id="tabML">
           <div style="margin-bottom: 1rem;">
             <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">
@@ -208,7 +445,7 @@
 
           <div style="margin-bottom: 1.25rem;">
             <div style="font-size: 0.85rem; font-weight: 600; color: #fde68a; margin-bottom: 0.4rem;">
-              Out-of-Domain Words (Verified via Live Knowledge Engine):
+              Out-of-Domain Words (Cross-Referenced via Live Fact Checking):
             </div>
             <div id="oovTokensList"></div>
           </div>
@@ -216,7 +453,7 @@
           <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.8rem;" id="rawStatsContainer"></div>
         </div>
 
-        <!-- Tab 3: LIME Feature Heatmap -->
+        <!-- Tab 5: LIME Feature Heatmap -->
         <div class="tab-pane" id="tabLIME">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
             <p style="font-size: 0.9rem; color: var(--text-secondary);">
@@ -232,23 +469,147 @@
           </div>
         </div>
 
-        <!-- Tab 4: Benchmark -->
-        <div class="tab-pane" id="tabBenchmark">
-          <div id="metricsSummary"></div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
-            <div>
-              <h4 style="font-size: 0.95rem; margin-bottom: 0.6rem; color: var(--text-secondary);">Confusion Matrix</h4>
-              <img src="/static/assets/confusion_matrix.png" alt="Confusion Matrix" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-subtle);" onerror="this.style.display='none'">
+      </div>
+
+    </section>
+
+    <!-- Standalone Always-Accessible Model Evaluation & Evolution Section -->
+    <section class="glass-card" id="globalEvaluationSection" style="margin-top: 2.5rem; padding: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.5rem; font-family: var(--font-heading); font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+            <span>📊</span> Model Evolution, Confusion Matrix & ROC Curve
+          </h2>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.25rem;">
+            Complete evaluation analytics across all algorithms, test distributions, and classification boundaries.
+          </p>
+        </div>
+        <span class="badge" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 0.4rem 0.8rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600;">
+          Holdout Test Set: 7,820 Articles
+        </span>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-badge-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Champion Accuracy</div>
+          <div class="kpi-value" style="color: #4ade80;">99.18%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Precision</div>
+          <div class="kpi-value" style="color: #38bdf8;">98.99%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Recall (Sensitivity)</div>
+          <div class="kpi-value" style="color: #818cf8;">99.50%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">F1-Score</div>
+          <div class="kpi-value" style="color: #c084fc;">99.25%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">ROC AUC</div>
+          <div class="kpi-value" style="color: #fbbf24;">0.9998</div>
+        </div>
+      </div>
+
+      <!-- Side-by-Side Confusion Matrix & ROC Curve -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+        <!-- Matrix View -->
+        <div class="cm-container">
+          <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
+            📉 Confusion Matrix Breakdown
+          </h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Stratified 20% validation split on 39,100 total articles.
+          </p>
+
+          <div class="cm-matrix-wrapper">
+            <div></div>
+            <div class="cm-header">Pred Fake</div>
+            <div class="cm-header">Pred Real</div>
+
+            <div class="cm-header vertical">Actual Fake</div>
+            <div class="cm-cell correct-fake">
+              <span class="cm-cell-count">3,538</span>
+              <span class="cm-cell-pct">98.80%</span>
+              <span class="cm-cell-tag">True Negative</span>
             </div>
-            <div>
-              <h4 style="font-size: 0.95rem; margin-bottom: 0.6rem; color: var(--text-secondary);">ROC Curve</h4>
-              <img src="/static/assets/roc_curve.png" alt="ROC Curve" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-subtle);" onerror="this.style.display='none'">
+            <div class="cm-cell error-cell">
+              <span class="cm-cell-count">43</span>
+              <span class="cm-cell-pct">1.20%</span>
+              <span class="cm-cell-tag">False Positive</span>
+            </div>
+
+            <div class="cm-header vertical">Actual Real</div>
+            <div class="cm-cell error-cell">
+              <span class="cm-cell-count">21</span>
+              <span class="cm-cell-pct">0.50%</span>
+              <span class="cm-cell-tag">False Negative</span>
+            </div>
+            <div class="cm-cell correct-real">
+              <span class="cm-cell-count">4,218</span>
+              <span class="cm-cell-pct">99.50%</span>
+              <span class="cm-cell-tag">True Positive</span>
             </div>
           </div>
         </div>
 
+        <!-- ROC Curve View -->
+        <div class="roc-chart-wrapper">
+          <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem; width: 100%;">
+            📈 ROC Characteristic Curve
+          </h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem; width: 100%;">
+            Area Under the Curve (AUC) measures the model's true positive vs false positive discrimination.
+          </p>
+
+          <svg class="roc-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+            <rect x="35" y="15" width="270" height="190" fill="rgba(15, 23, 42, 0.4)" stroke="rgba(255,255,255,0.06)" rx="4"/>
+            <line x1="35" y1="110" x2="305" y2="110" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3,3"/>
+            <line x1="170" y1="15" x2="170" y2="205" stroke="rgba(255,255,255,0.05)" stroke-dasharray="3,3"/>
+            <line x1="35" y1="205" x2="305" y2="15" stroke="rgba(148, 163, 184, 0.4)" stroke-dasharray="4,4" stroke-width="1.5"/>
+            <polygon points="35,205 38,20 305,20 305,205" fill="rgba(56, 189, 248, 0.12)"/>
+            <polyline points="35,205 37,30 45,22 80,20 180,20 305,20" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="39" cy="22" r="5" fill="#f43f5e" stroke="#ffffff" stroke-width="1.5"/>
+            <line x1="35" y1="205" x2="305" y2="205" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <line x1="35" y1="15" x2="35" y2="205" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <text x="170" y="228" fill="#94a3b8" font-size="10" text-anchor="middle">False Positive Rate (FPR)</text>
+            <text x="12" y="115" fill="#94a3b8" font-size="10" text-anchor="middle" transform="rotate(-90 12,115)">True Positive Rate</text>
+            <text x="35" y="218" fill="#64748b" font-size="9" text-anchor="middle">0.0</text>
+            <text x="305" y="218" fill="#64748b" font-size="9" text-anchor="middle">1.0</text>
+            <text x="25" y="208" fill="#64748b" font-size="9" text-anchor="end">0.0</text>
+            <text x="25" y="22" fill="#64748b" font-size="9" text-anchor="end">1.0</text>
+          </svg>
+
+          <div class="roc-stats-bar">
+            <div class="roc-stat-item">AUC: <strong>0.9998</strong></div>
+            <div class="roc-stat-item">Sensitivity: <strong>99.50%</strong></div>
+            <div class="roc-stat-item">Specificity: <strong>98.80%</strong></div>
+          </div>
+        </div>
       </div>
 
+      <!-- High-Resolution Matplotlib Plots Container -->
+      <div style="margin-top: 2rem;">
+        <h4 style="font-size: 1.1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.8rem;">
+          📷 Original Matplotlib Training Plots
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+          <div style="background: rgba(10, 14, 24, 0.6); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem;">
+              Confusion Matrix Heatmap
+            </div>
+            <img src="/static/assets/confusion_matrix.png" alt="Confusion Matrix Heatmap" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          </div>
+          <div style="background: rgba(10, 14, 24, 0.6); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem;">
+              Receiver Operating Characteristic (ROC) Curve
+            </div>
+            <img src="/static/assets/roc_curve.png" alt="ROC Curve Plot" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-subtle);">
+          </div>
+        </div>
+      </div>
     </section>
 
   </div>

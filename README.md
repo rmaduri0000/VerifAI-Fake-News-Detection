@@ -33,14 +33,37 @@ The system also provides:
 
 ---
 
-## 📈 Model Performance
+## 📈 Model Performance & Evolution
 
-| Metric    | Value  |
-| :--- | :--- |
-| **Accuracy**  | 99.18% |
-| **Precision** | 98.99% |
-| **Recall**    | 99.50% |
-| **F1 Score**  | 99.24% |
+### 🏆 Model Comparison Across Project Lifecycle
+
+| Stage | Model Architecture | Accuracy | Precision | Recall | F1-Score | Status |
+| :---: | :--- | :---: | :---: | :---: | :---: | :---: |
+| **1** | Multinomial Naive Bayes | 94.13% | 94.68% | 94.48% | 94.58% | Baseline |
+| **2** | Logistic Regression | 98.62% | 98.07% | 99.41% | 98.73% | Strong Linear |
+| **3** | Random Forest Classifier | 99.08% | 98.56% | 99.76% | 99.16% | Non-Linear Ensemble |
+| **4** | Linear SVC (Calibrated) | 99.28% | 99.13% | 99.55% | 99.34% | Top Linear |
+| **5** | **Voting Classifier (Ensemble)** | **99.18%** | **98.99%** | **99.50%** | **99.25%** | **🏆 Champion Model** |
+
+---
+
+### 📉 Confusion Matrix (Test Set: 7,820 Articles)
+
+| | Predicted Fake | Predicted Real | Total Actual |
+| :--- | :---: | :---: | :---: |
+| **Actual Fake** | **3,538 (98.80% TN)** | 43 (1.20% FP) | 3,581 |
+| **Actual Real** | 21 (0.50% FN) | **4,218 (99.50% TP)** | 4,239 |
+
+---
+
+### 📈 ROC Curve & AUC
+
+- **ROC AUC Score**: `0.9998` (Near-perfect discrimination)
+- **True Positive Rate (Sensitivity)**: `99.50%`
+- **False Positive Rate (1 - Specificity)**: `1.20%`
+- **Optimal Operating Threshold**: `0.50`
+
+---
 
 ### Classification Report
 
@@ -57,11 +80,15 @@ weighted avg       0.99      0.99      0.99      7820
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshots & Visual Analytics
 
 <p float="left">
-  <img src="assets/Prediction.png" width="45%" />
-  <img src="assets/lime_explanition.png" width="45%" />
+  <img src="assets/confusion_matrix.png" width="48%" />
+  <img src="assets/roc_curve.png" width="48%" />
+</p>
+<p float="left">
+  <img src="assets/Prediction.png" width="48%" />
+  <img src="assets/lime_explanition.png" width="48%" />
 </p>
 
 ---

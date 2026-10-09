@@ -332,37 +332,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Load Model Metrics into Benchmark Tab
+  // Load Model Metrics into Evolution & Benchmarks
   async function loadMetrics() {
     try {
       const res = await fetch('/api/metrics');
       if (!res.ok) return;
       const data = await res.json();
       
-      const metricsSummary = document.getElementById('metricsSummary');
-      if (metricsSummary) {
-        metricsSummary.innerHTML = `
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-            <div style="background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 8px; text-align: center; border: 1px solid var(--border-subtle);">
-              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Accuracy</div>
-              <div style="font-size: 1.4rem; font-weight: 700; color: #4ade80;">${data.accuracy}%</div>
-            </div>
-            <div style="background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 8px; text-align: center; border: 1px solid var(--border-subtle);">
-              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Precision</div>
-              <div style="font-size: 1.4rem; font-weight: 700; color: #38bdf8;">${data.precision}%</div>
-            </div>
-            <div style="background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 8px; text-align: center; border: 1px solid var(--border-subtle);">
-              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Recall</div>
-              <div style="font-size: 1.4rem; font-weight: 700; color: #a78bfa;">${data.recall}%</div>
-            </div>
-            <div style="background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 8px; text-align: center; border: 1px solid var(--border-subtle);">
-              <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">F1 Score</div>
-              <div style="font-size: 1.4rem; font-weight: 700; color: #f43f5e;">${data.f1_score}%</div>
-            </div>
-          </div>
-        `;
+      // Update Evolution Table with server data
+      const tbody = document.getElementById('evolutionTableBody');
+      if (tbody && data.model_evolution && data.model_evolution.length > 0) {
+        tbody.innerHTML = data.model_evolution.map(m => {
+          const isChampion = m.status.includes('Champion');
+          const stageBadge = isChampion 
+            ? `<span class="evolution-stage-badge" style="background: rgba(34, 197, 94, 0.25); color: #4ade80;">${m.stage}</span>`
+            : `<span class="evolution-stage-badge">${m.stage}</span>`;
+          const champTag = isChampion ? `<span class="champion-tag">Champion</span>` : '';
+          const rowClass = isChampion ? 'champion-row' : '';
+          const accColor = isChampion ? '#4ade80' : (m.accuracy > 99.2 ? '#a78bfa' : (m.accuracy > 98 ? '#38bdf8' : '#94a3b8'));
+          
+          return `
+            <tr class="${rowClass}">
+              <td>${stageBadge}</td>
+              <td><strong>${m.model}</strong> ${champTag}</td>
+              <td><span style="color: var(--text-muted); font-size: 0.8rem;">${m.category}</span></td>
+              <td><strong style="color: ${accColor}; font-size: 0.95rem;">${m.accuracy}%</strong></td>
+              <td>${m.precision}%</td>
+              <td>${m.recall}%</td>
+              <td>${m.f1_score}%</td>
+              <td style="color: ${isChampion ? '#86efac' : 'var(--text-muted)'}; font-size: 0.8rem;">${m.notes}</td>
+            </tr>
+          `;
+        }).join('');
       }
-    } catch (_) {}
+    } catch (err) {
+      console.warn('Metrics load error:', err);
+    }
   }
 
   loadMetrics();

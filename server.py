@@ -281,12 +281,92 @@ def api_metrics():
         "precision": 98.99,
         "recall": 99.50,
         "f1_score": 99.25,
+        "auc_score": 0.9998,
+        "model_architecture": "Ensemble Voting Classifier (Logistic Regression + Calibrated Linear SVC + Random Forest)",
+        "vectorizer": "TF-IDF Vectorizer with WordNet Lemmatization (7,000 features)",
         "classification_report": {
             "fake": {"precision": 0.99, "recall": 0.99, "f1": 0.99, "support": 3581},
-            "real": {"precision": 0.99, "recall": 1.00, "f1": 0.99, "support": 4239}
+            "real": {"precision": 0.99, "recall": 1.00, "f1": 0.99, "support": 4239},
+            "total_samples": 7820
         },
-        "model_architecture": "Ensemble Voting Classifier (Logistic Regression + Calibrated Linear SVC + Random Forest)",
-        "vectorizer": "TF-IDF Vectorizer with WordNet Lemmatization (7,000 features)"
+        "confusion_matrix": {
+            "tn": 3538,
+            "fp": 43,
+            "fn": 21,
+            "tp": 4218,
+            "total": 7820,
+            "fake_total": 3581,
+            "real_total": 4239,
+            "tn_pct": 98.80,
+            "fp_pct": 1.20,
+            "fn_pct": 0.50,
+            "tp_pct": 99.50,
+            "image_url": "/static/assets/confusion_matrix.png"
+        },
+        "roc_curve": {
+            "auc": 0.9998,
+            "optimal_threshold": 0.50,
+            "tpr": 99.50,
+            "fpr": 1.20,
+            "image_url": "/static/assets/roc_curve.png"
+        },
+        "model_evolution": [
+            {
+                "stage": 1,
+                "model": "Multinomial Naive Bayes",
+                "category": "Probabilistic Baseline",
+                "accuracy": 94.13,
+                "precision": 94.68,
+                "recall": 94.48,
+                "f1_score": 94.58,
+                "status": "Baseline",
+                "notes": "Simple word frequency model; fast baseline but assumes feature independence."
+            },
+            {
+                "stage": 2,
+                "model": "Logistic Regression",
+                "category": "Linear Classifier",
+                "accuracy": 98.62,
+                "precision": 98.07,
+                "recall": 99.41,
+                "f1_score": 98.73,
+                "status": "Strong",
+                "notes": "High performance in sparse TF-IDF space; serves as linear backbone."
+            },
+            {
+                "stage": 3,
+                "model": "Random Forest",
+                "category": "Ensemble (Bagging)",
+                "accuracy": 99.08,
+                "precision": 98.56,
+                "recall": 99.76,
+                "f1_score": 99.16,
+                "status": "Advanced",
+                "notes": "Non-linear decision trees; captured non-linear semantic interactions."
+            },
+            {
+                "stage": 4,
+                "model": "Linear Support Vector Machine (Linear SVC)",
+                "category": "Max-Margin Hyperplane",
+                "accuracy": 99.28,
+                "precision": 99.13,
+                "recall": 99.55,
+                "f1_score": 99.34,
+                "status": "Top Linear",
+                "notes": "Highest individual linear accuracy; calibrated with Platt sigmoid scaling."
+            },
+            {
+                "stage": 5,
+                "model": "Voting Classifier (Ensemble)",
+                "category": "Soft Voting Ensemble",
+                "accuracy": 99.18,
+                "precision": 98.99,
+                "recall": 99.50,
+                "f1_score": 99.25,
+                "status": "Champion Production",
+                "notes": "Combines Logistic Regression, Calibrated Linear SVC, and Random Forest for robust, low-variance predictions."
+            }
+        ]
     }
 
 # Mount static frontend directory

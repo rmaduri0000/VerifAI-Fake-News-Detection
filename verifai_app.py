@@ -548,13 +548,29 @@ if st.session_state.has_predicted:
 
 # Evaluation Report Expander
 st.markdown("---")
-with st.expander("📊 Model Evaluation Report (Trained Dataset)"):
-    st.subheader("🧮 Classification Metrics")
+with st.expander("📊 Model Evaluation & Evolution Report (Trained Dataset)", expanded=False):
+    st.subheader("📈 Model Evolution & Benchmarks")
     st.markdown("""
-    - **Accuracy**: `0.9918`
-    - **Precision**: `0.9899`
-    - **Recall**: `0.9950`
-    - **F1 Score**: `0.9925`
+    Comparison of all machine learning architectures tested throughout development:
+    """)
+    
+    st.markdown("""
+    | Stage | Model Architecture | Accuracy | Precision | Recall | F1-Score | Status |
+    | :---: | :--- | :---: | :---: | :---: | :---: | :---: |
+    | **1** | Multinomial Naive Bayes | 94.13% | 94.68% | 94.48% | 94.58% | Baseline |
+    | **2** | Logistic Regression | 98.62% | 98.07% | 99.41% | 98.73% | Strong Linear |
+    | **3** | Random Forest Classifier | 99.08% | 98.56% | 99.76% | 99.16% | Non-Linear Bagging |
+    | **4** | Linear SVC (Calibrated) | 99.28% | 99.13% | 99.55% | 99.34% | Top Linear |
+    | **5** | **Voting Classifier (Ensemble)** | **99.18%** | **98.99%** | **99.50%** | **99.25%** | **🏆 Production Champion** |
+    """)
+
+    st.subheader("🧮 Champion Classification Metrics")
+    st.markdown("""
+    - **Accuracy**: `0.9918` (99.18%)
+    - **Precision**: `0.9899` (98.99%)
+    - **Recall**: `0.9950` (99.50%)
+    - **F1 Score**: `0.9925` (99.25%)
+    - **ROC AUC**: `0.9998` (~1.00)
     """)
 
     st.markdown("### 🔍 Classification Report")
@@ -569,11 +585,14 @@ macro avg       0.99      0.99      0.99      7820
 weighted avg    0.99      0.99      0.99      7820
     """, language='text')
 
-    st.subheader("📉 Confusion Matrix")
-    st.image("./assets/confusion_matrix.png", caption="Confusion Matrix", use_container_width=True)
+    col_cm, col_roc = st.columns(2)
+    with col_cm:
+        st.subheader("📉 Confusion Matrix")
+        st.image("./assets/confusion_matrix.png", caption="Confusion Matrix (Fake: 3538 TN / 43 FP, Real: 21 FN / 4218 TP)", use_container_width=True)
 
-    st.subheader("📈 ROC Curve")
-    st.image("./assets/roc_curve.png", caption="ROC Curve (AUC ≈ 1.00)", use_container_width=True)
+    with col_roc:
+        st.subheader("📈 ROC Curve")
+        st.image("./assets/roc_curve.png", caption="ROC Curve (AUC ≈ 1.00, Sensitivity: 99.50%)", use_container_width=True)
 
 # Footer
 st.markdown("---")
