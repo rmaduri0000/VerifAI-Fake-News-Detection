@@ -191,6 +191,66 @@
         </div>
       </div>
 
+      <!-- Prominent AI Explanation & Diagnostic Evidence Card -->
+      <div class="glass-card explanation-card" id="explanationCard" style="margin-bottom: 1.5rem; border-left: 4px solid var(--accent-blue);">
+        <div class="explanation-card-header">
+          <div class="explanation-header-title">
+            <span style="font-size: 1.3rem;">💡</span>
+            <div>
+              <h3 style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: #fff;">
+                Why is this <span id="expVerdictKeyword" style="color: #4ade80;">Real / Fake</span>?
+              </h3>
+              <p style="font-size: 0.8rem; color: var(--text-muted);">AI Forensic Explanation & Decision Rationale</p>
+            </div>
+          </div>
+          <span class="explanation-badge-pill" id="expVerdictBadgePill">69.3% Confident</span>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="explanation-summary-box" id="expSummaryBox">
+          <p id="expSummaryText" style="font-size: 0.95rem; line-height: 1.5; color: var(--text-primary); font-weight: 500;">
+            <!-- Summary will load here -->
+          </p>
+        </div>
+
+        <!-- 3 Pillars Breakdown -->
+        <div class="explanation-pillars-grid">
+          <div class="explanation-pillar">
+            <div class="pillar-title">
+              <span class="pillar-icon" id="expFactIcon">🌐</span>
+              <span>1. Live Fact Verification</span>
+            </div>
+            <p class="pillar-desc" id="expFactDesc"></p>
+          </div>
+
+          <div class="explanation-pillar">
+            <div class="pillar-title">
+              <span class="pillar-icon" id="expMlIcon">🧠</span>
+              <span>2. AI Stylometrics & Patterns</span>
+            </div>
+            <p class="pillar-desc" id="expMlDesc"></p>
+          </div>
+
+          <div class="explanation-pillar">
+            <div class="pillar-title">
+              <span class="pillar-icon" id="expToneIcon">🔬</span>
+              <span>3. Tone & Sensationalism</span>
+            </div>
+            <p class="pillar-desc" id="expToneDesc"></p>
+          </div>
+        </div>
+
+        <!-- Influential Words Driving Decision -->
+        <div class="explanation-words-row" id="expWordsRow" style="margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--border-subtle);">
+          <div style="font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 0.6rem;">
+            🔑 Key Words That Influenced This AI Verdict:
+          </div>
+          <div class="explanation-chips-wrap" id="expChipsWrap">
+            <!-- Badges will load here -->
+          </div>
+        </div>
+      </div>
+
       <!-- Deep Analysis Tabs in Verification Output -->
       <div class="glass-card" style="padding: 1.5rem;">
         

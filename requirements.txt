@@ -1,9 +1,7 @@
 joblib
 lime
-matplotlib
 numpy
 scikit-learn
-streamlit
 nltk
 fastapi
 uvicorn

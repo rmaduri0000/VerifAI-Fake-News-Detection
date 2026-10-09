@@ -18,13 +18,13 @@ The system also provides:
 -   **Headline Calibration ($p_0 \approx 10.5\%$)**: Adjusts for baseline prior shift on short headlines so genuine titles aren't flagged as fake.
 -   **LIME Explainability**: Visual feature importance highlighting showing exactly why a model made a decision.
 -   **Vocabulary Signals Inspector**: Identifies recognized training terms vs. out-of-domain words.
--   **Modern Streamlit Web App**: Intuitive, interactive UI with credibility meters, source cards, and metric visualizations.
+-   **Modern Web App**: Intuitive, interactive UI with credibility meters, source cards, and metric visualizations.
 
 ---
 
 ## 🛠️ Tech Stack
 
--   **Frontend**: Modern HTML5, Custom CSS3 (Glassmorphism design system), Vanilla JavaScript (ES6+), Streamlit
+-   **Frontend**: Modern HTML5, Custom CSS3 (Glassmorphism design system), Vanilla JavaScript (ES6+)
 -   **Backend**: FastAPI, Uvicorn, Python 3.10+
 -   **ML Models**: Logistic Regression, Linear SVC (Calibrated), Random Forest (Voting Classifier)
 -   **Feature Extraction**: TF-IDF Vectorizer with NLTK WordNet Lemmatization
@@ -118,24 +118,17 @@ pip install -r requirements.txt
 
 4. **Run the Application**
 
-### Option A: Modern HTML5 / CSS3 / JavaScript Web App (Recommended)
 ```bash
 python -m uvicorn server:app --host 127.0.0.1 --port 8000
 ```
 Open **[http://localhost:8000](http://localhost:8000)** in your browser for the full glassmorphism UI with real-time fact checking, animations, and LIME explainability.
-
-### Option B: Streamlit Dashboard
-```bash
-streamlit run verifai_app.py
-```
-Open **`http://localhost:8501`** for the Streamlit dashboard.
 
 ---
 
 ## 🔗 Links
 
 -   **GitHub Repository**: [https://github.com/rmaduri0000/VerifAI-Fake-News-Detection](https://github.com/rmaduri0000/VerifAI-Fake-News-Detection)
--   **Streamlit Documentation**: [https://docs.streamlit.io/](https://docs.streamlit.io/)
+-   **FastAPI Documentation**: [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)
 -   **LIME Documentation**: [https://github.com/marcotcr/lime](https://github.com/marcotcr/lime)
 
 ---

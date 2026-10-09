@@ -192,6 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
       fakeProgressFill.style.width = `${data.fake_probability}%`;
     }, 50);
 
+    // 2.5 Prominent AI Explanation & Diagnostic Evidence
+    renderExplanation(data.explanation, data);
+
     // 3. Fact Checking Evidence Tab
     renderFactEvidence(data.fact_check);
 
@@ -349,6 +352,76 @@ document.addEventListener('DOMContentLoaded', () => {
     btnPrintReport.addEventListener('click', () => {
       window.print();
     });
+  }
+
+  function renderExplanation(exp, data) {
+    const expCard = document.getElementById('explanationCard');
+    if (!expCard || !exp) return;
+
+    const isFake = data.verdict_type === 'fake';
+    const isVerified = data.verdict_type === 'real_verified';
+    const isReal = data.verdict_type === 'real' || isVerified;
+
+    // Accent coloring
+    const accentColor = isFake ? '#f43f5e' : (isReal ? '#22c55e' : '#f59e0b');
+    expCard.style.borderLeftColor = accentColor;
+
+    const keywordEl = document.getElementById('expVerdictKeyword');
+    if (keywordEl) {
+      keywordEl.textContent = isFake ? 'Fake' : (isReal ? 'Real' : 'Inconclusive');
+      keywordEl.style.color = accentColor;
+    }
+
+    const badgePill = document.getElementById('expVerdictBadgePill');
+    if (badgePill) {
+      badgePill.textContent = `${data.confidence}% Confidence`;
+      badgePill.style.background = isFake ? 'rgba(244, 63, 94, 0.18)' : 'rgba(34, 197, 94, 0.18)';
+      badgePill.style.color = isFake ? '#fb7185' : '#4ade80';
+      badgePill.style.borderColor = isFake ? 'rgba(244, 63, 94, 0.35)' : 'rgba(34, 197, 94, 0.35)';
+    }
+
+    const summaryText = document.getElementById('expSummaryText');
+    if (summaryText) {
+      summaryText.textContent = exp.summary;
+    }
+
+    // 3 Diagnostic Pillars
+    const factIcon = document.getElementById('expFactIcon');
+    const factDesc = document.getElementById('expFactDesc');
+    if (factIcon) factIcon.textContent = isVerified ? '✅' : (isFake ? '❌' : 'ℹ️');
+    if (factDesc) factDesc.textContent = exp.fact_reason;
+
+    const mlIcon = document.getElementById('expMlIcon');
+    const mlDesc = document.getElementById('expMlDesc');
+    if (mlIcon) mlIcon.textContent = isFake ? '⚠️' : '🎯';
+    if (mlDesc) mlDesc.textContent = exp.ml_reason;
+
+    const toneIcon = document.getElementById('expToneIcon');
+    const toneDesc = document.getElementById('expToneDesc');
+    if (toneIcon) toneIcon.textContent = '🔬';
+    if (toneDesc) toneDesc.textContent = exp.tone_reason;
+
+    // Influential Word Chips
+    const chipsWrap = document.getElementById('expChipsWrap');
+    if (chipsWrap) {
+      if (exp.token_impacts && exp.token_impacts.length > 0) {
+        chipsWrap.innerHTML = exp.token_impacts.map(t => {
+          const isWordReal = t.type === 'real';
+          const bg = isWordReal ? 'rgba(34, 197, 94, 0.15)' : 'rgba(244, 63, 94, 0.15)';
+          const textCol = isWordReal ? '#4ade80' : '#fb7185';
+          const borderCol = isWordReal ? 'rgba(34, 197, 94, 0.35)' : 'rgba(244, 63, 94, 0.35)';
+          const icon = isWordReal ? '🟢' : '🔴';
+          return `
+            <div class="exp-word-chip" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.32rem 0.7rem; border-radius: 999px; font-size: 0.8rem; background: ${bg}; color: ${textCol}; border: 1px solid ${borderCol};">
+              <span>${icon} <strong>${t.word}</strong></span>
+              <span style="opacity: 0.85; font-size: 0.72rem; padding: 1px 5px; background: rgba(0,0,0,0.35); border-radius: 4px;">${t.label}</span>
+            </div>
+          `;
+        }).join('');
+      } else {
+        chipsWrap.innerHTML = '<span style="color: var(--text-muted); font-size: 0.85rem;">No strong vocabulary weights found for this short input.</span>';
+      }
+    }
   }
 
   function renderFactEvidence(fact) {

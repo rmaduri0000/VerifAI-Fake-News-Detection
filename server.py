@@ -65,11 +65,7 @@ def preprocess_text(text: str) -> str:
     return " ".join(cleaned)
 
 def calibrate_probability(p_real: float, p0: float = ZERO_VECTOR_REAL_PROB) -> float:
-    if p_real >= p0:
-        cal_real = 0.5 + 0.5 * ((p_real - p0) / (1.0 - p0))
-    else:
-        cal_real = 0.5 * (p_real / p0)
-    return float(min(max(cal_real, 0.0), 1.0))
+    return float(min(max(p_real, 0.0), 1.0))
 
 def verify_fact_live(claim: str):
     if not claim or len(claim.strip()) < 5:
@@ -261,6 +257,67 @@ def compute_claim_evaluation(p_real: float, p_fake: float, fact_result: dict, ve
         "threshold_simulations": threshold_simulations
     }
 
+def build_explanation(claim: str, verdict: str, verdict_type: str, confidence: float, p_real: float, p_fake: float, fact_result: dict, stylometrics: dict, matched: list, oov: list):
+    lr = model.named_estimators_['lr'] if hasattr(model, 'named_estimators_') and 'lr' in model.named_estimators_ else None
+    token_impacts = []
+    if lr is not None:
+        for t in matched:
+            if t in vectorizer.vocabulary_:
+                idx = vectorizer.vocabulary_[t]
+                w = float(lr.coef_[0][idx])
+                token_impacts.append({
+                    "word": t,
+                    "weight": round(w, 2),
+                    "type": "real" if w > 0 else "fake",
+                    "label": f"+{round(w, 2)} (Real)" if w > 0 else f"{round(w, 2)} (Fake)"
+                })
+        token_impacts.sort(key=lambda x: abs(x["weight"]), reverse=True)
+    
+    fake_words = [t["word"] for t in token_impacts if t["type"] == "fake"][:5]
+    real_words = [t["word"] for t in token_impacts if t["type"] == "real"][:5]
+    
+    sens_score = stylometrics.get("sensationalism_index", 0)
+    conf_pct = round(confidence * 100, 1) if confidence <= 1.0 else round(confidence, 1)
+
+    if verdict_type == "real_verified":
+        title = fact_result.get("title", "Wikipedia") if fact_result else "Wikipedia"
+        ratio = int(fact_result.get("match_ratio", 0) * 100) if fact_result else 100
+        fact_reason = f"Live Wikipedia cross-referencing matched documented event '{title}' with {ratio}% keyword correlation."
+        ml_reason = f"Writing style and vocabulary align with authentic news reporting ({conf_pct}% credibility)."
+        summary = f"Confirmed as REAL NEWS because live encyclopedic records substantiate the claim and journalistic language structure is authentic."
+    elif verdict_type == "fake":
+        if fact_result and fact_result.get("title"):
+            fact_reason = f"Wikipedia found NO factual record of this claim. The closest search returned unrelated topic '{fact_result.get('title')}' with only {int(fact_result.get('match_ratio',0)*100)}% keyword overlap."
+        else:
+            fact_reason = "No documented evidence or encyclopedic records were found on Wikipedia for this claim."
+        ml_reason = f"The Machine Learning Voting Ensemble determined a {round(p_fake * 100, 1)}% fake probability based on vocabulary patterns common in viral misinformation."
+        summary = f"Detected as FAKE / UNVERIFIED because it completely lacks authentic documentation in encyclopedic records and exhibits linguistic markers common in viral social media rumors."
+    elif verdict_type == "real":
+        fact_reason = "No explicit historical event page was matched, but the headline did not trigger false claim records."
+        ml_reason = f"The Machine Learning Voting Ensemble verified formal, credible journalistic phrasing ({round(p_real * 100, 1)}% real probability)."
+        summary = f"Classified as REAL NEWS because its lexical structure and objective tone match credible journalistic reporting standards."
+    else:
+        fact_reason = "Could not find verifiable records for the given terms in global knowledge bases."
+        ml_reason = "Input vocabulary has low overlap with trained journalistic terms, making an automated verdict inconclusive."
+        summary = "Result is INCONCLUSIVE because there is insufficient vocabulary evidence or encyclopedic documentation to confirm or deny this claim."
+
+    if sens_score > 35:
+        tone_reason = f"High clickbait score ({sens_score}/100) triggered by urgent, dramatic rhetoric, all-caps words, or exclamation triggers."
+    elif sens_score > 15:
+        tone_reason = f"Moderate sensationalism index ({sens_score}/100) detected in phrasing."
+    else:
+        tone_reason = f"Clean, objective tone detected ({sens_score}/100 sensationalism index) without clickbait hype."
+
+    return {
+        "summary": summary,
+        "fact_reason": fact_reason,
+        "ml_reason": ml_reason,
+        "tone_reason": tone_reason,
+        "token_impacts": token_impacts[:8],
+        "fake_words": fake_words,
+        "real_words": real_words
+    }
+
 # Pydantic models for API
 class VerifyRequest(BaseModel):
     title: Optional[str] = ""
@@ -299,14 +356,11 @@ def api_verify(req: VerifyRequest):
     raw_real = float(raw_prob[1])
     raw_fake = float(raw_prob[0])
     
-    # 3. Mode Calibration
+    # 3. Model Classification
     is_inconclusive = (len(matched) == 0)
     if is_inconclusive:
         cal_real = 0.50
         ml_pred = None
-    elif req.mode == "headline":
-        cal_real = calibrate_probability(raw_real)
-        ml_pred = 1 if cal_real >= 0.50 else 0
     else:
         cal_real = raw_real
         ml_pred = int(model.predict(X_input)[0])
@@ -343,6 +397,7 @@ def api_verify(req: VerifyRequest):
 
     stylometrics = analyze_stylometrics(combined_input)
     claim_eval = compute_claim_evaluation(p_real, p_fake, fact_result, verdict_type)
+    explanation = build_explanation(combined_input, verdict, verdict_type, confidence, p_real, p_fake, fact_result, stylometrics, matched, oov)
 
     return {
         "verdict": verdict,
@@ -357,6 +412,7 @@ def api_verify(req: VerifyRequest):
         "fact_check": fact_result,
         "stylometrics": stylometrics,
         "claim_evaluation": claim_eval,
+        "explanation": explanation,
         "ml_analysis": {
             "matched_tokens": matched,
             "oov_tokens": oov,
@@ -498,10 +554,10 @@ def api_metrics():
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "frontend")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 
-if os.path.exists(STATIC_DIR):
-    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 if os.path.exists(ASSETS_DIR):
     app.mount("/static/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/")
 def serve_index():
