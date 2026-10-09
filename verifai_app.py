@@ -12,6 +12,18 @@ from lime.lime_text import LimeTextExplainer
 import matplotlib.pyplot as plt
 import streamlit.components.v1 as components
 
+# Configure page settings and native GitHub menu links
+st.set_page_config(
+    page_title="VerifAI - News & Fact Verifier",
+    page_icon="🧠",
+    layout="wide",
+    menu_items={
+        'Get Help': 'https://github.com/rmaduri0000/VerifAI-Fake-News-Detection',
+        'Report a bug': 'https://github.com/rmaduri0000/VerifAI-Fake-News-Detection/issues',
+        'About': 'https://github.com/rmaduri0000/VerifAI-Fake-News-Detection'
+    }
+)
+
 # Ensure required NLTK resources are available
 try:
     nltk.data.find('corpora/wordnet')
@@ -144,7 +156,7 @@ vectorizer, model = load_model()
 st.sidebar.title("ℹ️ About VerifAI")
 st.sidebar.markdown(
     """
-    **VerifAI Hybrid** is a next-generation news & claim verification platform combining:
+    **VerifAI Hybrid** is a news & claim verification platform combining:
 
     🌐 **Live Fact-Checking Engine**:
     Queries live global knowledge bases to verify real-world facts (Sports, History, Science, Geography, World Events).
@@ -175,14 +187,21 @@ mode = st.sidebar.radio(
 )
 is_headline_mode = "Headline Mode" in mode
 
+# Sidebar GitHub Link
 st.sidebar.markdown("---")
-st.sidebar.markdown("🔗 [View on GitHub](https://github.com/rmaduri0000/VerifAI-Fake-News-Detection)")
+st.sidebar.markdown("### 🐙 GitHub Project")
+st.sidebar.link_button(
+    "⭐ Open My GitHub Repo", 
+    "https://github.com/rmaduri0000/VerifAI-Fake-News-Detection", 
+    use_container_width=True
+)
+st.sidebar.markdown("👤 **Profile**: [github.com/rmaduri0000](https://github.com/rmaduri0000)")
 
 # Custom CSS for better styling
 st.markdown("""
 <style>
     .main .block-container {
-        padding-top: 2rem;
+        padding-top: 1.5rem;
     }
     
     .stButton > button {
@@ -258,13 +277,22 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# App UI
-st.title("🧠 VerifAI - Universal News & Fact Verifier")
-st.markdown("Enter any **news claim, sports event, historical fact, or headline** to verify.")
+# App UI Header with GitHub Button
+col_header_title, col_header_git = st.columns([3.2, 1])
+with col_header_title:
+    st.title("🧠 VerifAI - Universal News & Fact Verifier")
+    st.markdown("Enter any **news claim, sports event, historical fact, or headline** to verify.")
+with col_header_git:
+    st.write("")  # Vertical spacing
+    st.link_button(
+        "🐙 View on GitHub", 
+        "https://github.com/rmaduri0000/VerifAI-Fake-News-Detection", 
+        use_container_width=True
+    )
 
 # Input fields
 title_input = st.text_input("📰 Enter news claim or headline:", placeholder="e.g. India won the Cricket World Cup in 2011.")
-context_input = st.text_area("📝 (Optional) Enter context, body paragraph, or source details:", height=120, placeholder="Paste a few sentences from the news article or context...")
+context_input = st.text_area("📝 (Optional) Enter context, body paragraph, or source details:", height=110, placeholder="Paste a few sentences from the news article or context...")
 
 combined_input = (title_input + " " + context_input).strip() if context_input else title_input.strip()
 
@@ -395,7 +423,6 @@ if check_btn:
                     ml_pred = model.predict(X_input)[0]
 
             # 3. Hybrid Fusion Logic
-            # If Live Fact-Checking strongly verified the claim (e.g. India won Cricket World Cup in 2011)
             if fact_result and fact_result.get("is_verified", False):
                 final_pred = 1  # Real
                 final_conf = max(0.85, fact_result.get("match_ratio", 0.85))
@@ -547,3 +574,12 @@ weighted avg    0.99      0.99      0.99      7820
 
     st.subheader("📈 ROC Curve")
     st.image("./assets/roc_curve.png", caption="ROC Curve (AUC ≈ 1.00)", use_container_width=True)
+
+# Footer
+st.markdown("---")
+st.markdown("""
+<div style="text-align: center; color: #64748b; font-size: 0.9rem; padding: 12px 0;">
+    VerifAI &bull; Created by <a href="https://github.com/rmaduri0000" target="_blank" style="color: #2563eb; font-weight: 600; text-decoration: none;">Rajashekhar Maduri (@rmaduri0000)</a> &bull; 
+    <a href="https://github.com/rmaduri0000/VerifAI-Fake-News-Detection" target="_blank" style="color: #2563eb; text-decoration: none;">View Source Code on GitHub ↗</a>
+</div>
+""", unsafe_allow_html=True)
