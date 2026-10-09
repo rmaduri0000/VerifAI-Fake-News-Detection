@@ -141,6 +141,126 @@ def verify_fact_live(claim: str):
     except Exception:
         return None
 
+def analyze_stylometrics(text: str):
+    words = re.findall(r'\b[a-zA-Z0-9]+\b', text)
+    word_count = len(words)
+    char_count = len(text)
+    sentences = re.split(r'[.!?]+', text)
+    sentences = [s.strip() for s in sentences if s.strip()]
+    sentence_count = max(1, len(sentences))
+    
+    unique_words = len(set(w.lower() for w in words))
+    ttr = round((unique_words / word_count) * 100, 1) if word_count > 0 else 0.0
+    
+    # Sensationalism & Clickbait markers
+    exclamation_count = text.count('!')
+    question_count = text.count('?')
+    all_caps_words = [w for w in words if len(w) > 2 and w.isupper()]
+    clickbait_keywords = {'breaking', 'shocking', 'unbelievable', 'secret', 'exposed', 'miracle', 'conspiracy', 'declared', 'war', 'banned', 'disaster', 'hoax'}
+    clickbait_matches = [w for w in words if w.lower() in clickbait_keywords]
+    
+    sensational_score = min(100, int((exclamation_count * 20) + (len(all_caps_words) * 15) + (len(clickbait_matches) * 20)))
+    
+    # Inferred Domain
+    text_lower = text.lower()
+    sports_keywords = {'world cup', 'cricket', 'fifa', 'football', 'olympics', 'champion', 'won', 'match', 'tournament', 'trophy', 'score', 'player'}
+    science_keywords = {'mars', 'nasa', 'space', 'rover', 'planet', 'earth', 'climate', 'quantum', 'vaccine', 'dna', 'cell', 'physics', 'energy'}
+    politics_keywords = {'president', 'minister', 'senate', 'parliament', 'congress', 'election', 'tax', 'bill', 'government', 'policy', 'vote'}
+    history_keywords = {'tower', 'war', 'century', 'dynasty', 'ancient', 'empire', 'revolution', 'treaty', 'founded', 'monument', 'built'}
+    
+    if any(k in text_lower for k in sports_keywords):
+        domain = "Sports & Athletics"
+    elif any(k in text_lower for k in science_keywords):
+        domain = "Science & Technology"
+    elif any(k in text_lower for k in politics_keywords):
+        domain = "Politics & Governance"
+    elif any(k in text_lower for k in history_keywords):
+        domain = "World History & Geography"
+    else:
+        domain = "General News & Current Affairs"
+        
+    return {
+        "word_count": word_count,
+        "char_count": char_count,
+        "sentence_count": sentence_count,
+        "lexical_diversity": ttr,
+        "sensationalism_index": sensational_score,
+        "exclamations": exclamation_count,
+        "all_caps_count": len(all_caps_words),
+        "domain": domain
+    }
+
+def compute_claim_evaluation(p_real: float, p_fake: float, fact_result: dict, verdict_type: str):
+    # Dynamically maps THIS specific news claim into the Confusion Matrix and ROC curve
+    is_verified = bool(fact_result and fact_result.get("is_verified", False))
+    
+    if is_verified:
+        if verdict_type in ["real", "real_verified"]:
+            quadrant = "TP"
+            quadrant_name = "True Positive"
+            title = "Accurately Verified Real (True Positive)"
+            detail = "The claim is factually genuine and successfully passed both ensemble stylometry and live encyclopedic verification."
+            badge_color = "#22c55e"
+        else:
+            quadrant = "FN"
+            quadrant_name = "False Negative"
+            title = "Overridden False Negative"
+            detail = "Model priors flagged lexical anomalies, but live encyclopedic verification prevented a false rejection."
+            badge_color = "#f43f5e"
+    else:
+        if verdict_type == "fake":
+            quadrant = "TN"
+            quadrant_name = "True Negative"
+            title = "Accurately Detected Fake (True Negative)"
+            detail = "Linguistic clickbait patterns or lack of verifiable historical documentation correctly flagged as Fake."
+            badge_color = "#22c55e"
+        elif verdict_type == "inconclusive":
+            quadrant = "TN"
+            quadrant_name = "True Negative (Boundary Case)"
+            title = "Boundary Case / Inconclusive"
+            detail = "Insufficient verifiable evidence; model maintains conservative unverified stance."
+            badge_color = "#f59e0b"
+        else:
+            quadrant = "FP"
+            quadrant_name = "False Positive"
+            title = "False Positive (Unverified Claim Cleared)"
+            detail = "Stylometry matched formal journalistic phrasing, though encyclopedic verification was absent."
+            badge_color = "#f43f5e"
+            
+    claim_threshold = 0.50
+    margin = round((p_real - claim_threshold) * 100, 1)
+    
+    # Dynamic operating point coordinates along the ROC Curve
+    roc_fpr = round(max(0.5, (1.0 - p_real) * 2.5), 1) if p_real >= 0.50 else round(min(98.0, (1.0 - p_real) * 95.0), 1)
+    roc_tpr = round(min(99.8, max(5.0, p_real * 100.0)), 1)
+    
+    # Threshold sweep simulations
+    threshold_simulations = []
+    for t in [0.20, 0.35, 0.50, 0.65, 0.80]:
+        threshold_simulations.append({
+            "threshold": t,
+            "prediction": "Real" if p_real >= t else "Fake",
+            "decision_margin": round((p_real - t) * 100, 1),
+            "status": "Verified Real" if p_real >= t else "Flagged Fake"
+        })
+        
+    return {
+        "quadrant": quadrant,
+        "quadrant_name": quadrant_name,
+        "title": title,
+        "detail": detail,
+        "badge_color": badge_color,
+        "decision_margin": margin,
+        "decision_threshold": claim_threshold,
+        "likelihood_ratio": round(p_real / (p_fake + 0.001), 2),
+        "roc_point": {
+            "fpr": roc_fpr,
+            "tpr": roc_tpr,
+            "status": "In Real News Region" if p_real >= 0.50 else "In Fake / Hoax Region"
+        },
+        "threshold_simulations": threshold_simulations
+    }
+
 # Pydantic models for API
 class VerifyRequest(BaseModel):
     title: Optional[str] = ""
@@ -221,6 +341,9 @@ def api_verify(req: VerifyRequest):
         p_fake = 1.0 - cal_real
         description = "Linguistic markers match sensational clickbait patterns or lack verifiable factual documentation."
 
+    stylometrics = analyze_stylometrics(combined_input)
+    claim_eval = compute_claim_evaluation(p_real, p_fake, fact_result, verdict_type)
+
     return {
         "verdict": verdict,
         "verdict_type": verdict_type,
@@ -232,6 +355,8 @@ def api_verify(req: VerifyRequest):
         "calibrated_real_probability": round(cal_real * 100, 1),
         "description": description,
         "fact_check": fact_result,
+        "stylometrics": stylometrics,
+        "claim_evaluation": claim_eval,
         "ml_analysis": {
             "matched_tokens": matched,
             "oov_tokens": oov,

@@ -198,12 +198,157 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. ML Vocabulary Analysis Tab
     renderMLAnalysis(data.ml_analysis, data);
 
+    // 5. Dynamic Claim Confusion Matrix & Dynamic ROC Curve
+    renderClaimEvaluation(data.claim_evaluation, data.stylometrics, data);
+
     // Reset LIME tab for new query
     limeContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Click the button below to generate deep linguistic feature importance using LIME.</p>';
     btnFetchLime.style.display = 'inline-flex';
 
     // Scroll smoothly to results
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Global store for threshold simulation
+  let currentClaimRealProb = 0.50;
+
+  function renderClaimEvaluation(claimEval, stylometrics, data) {
+    if (!claimEval) return;
+
+    currentClaimRealProb = data.real_probability / 100.0;
+
+    // 1. Update Claim Locator Banner
+    const quadrantText = document.getElementById('claimQuadrantText');
+    const quadrantDetail = document.getElementById('claimQuadrantDetail');
+    const domainText = document.getElementById('claimDomainText');
+    const marginText = document.getElementById('claimMarginText');
+    const likelihoodText = document.getElementById('claimLikelihoodText');
+
+    if (quadrantText) quadrantText.textContent = `${claimEval.quadrant_name} (${claimEval.quadrant})`;
+    if (quadrantDetail) quadrantDetail.textContent = claimEval.detail;
+    if (domainText && stylometrics) domainText.textContent = stylometrics.domain;
+    if (marginText) {
+      const marginSign = claimEval.decision_margin >= 0 ? '+' : '';
+      marginText.textContent = `${marginSign}${claimEval.decision_margin}%`;
+      marginText.style.color = claimEval.decision_margin >= 0 ? '#4ade80' : '#f43f5e';
+    }
+    if (likelihoodText) likelihoodText.textContent = claimEval.likelihood_ratio;
+
+    // 2. Update Forensic Stylometrics
+    if (stylometrics) {
+      const sensVal = document.getElementById('forensicSensationalism');
+      const sensDesc = document.getElementById('forensicSensationalismDesc');
+      const ttrVal = document.getElementById('forensicTTR');
+      const lenVal = document.getElementById('forensicLength');
+      const charsVal = document.getElementById('forensicChars');
+      const punctVal = document.getElementById('forensicPunctuation');
+
+      if (sensVal) {
+        sensVal.textContent = `${stylometrics.sensationalism_index} / 100`;
+        sensVal.style.color = stylometrics.sensationalism_index > 50 ? '#f43f5e' : (stylometrics.sensationalism_index > 20 ? '#fbbf24' : '#4ade80');
+      }
+      if (sensDesc) {
+        sensDesc.textContent = stylometrics.sensationalism_index > 50 
+          ? 'High sensationalism & viral clickbait triggers' 
+          : (stylometrics.sensationalism_index > 20 ? 'Moderate rhetorical tone' : 'Clean journalistic & objective language');
+      }
+      if (ttrVal) ttrVal.textContent = `${stylometrics.lexical_diversity}%`;
+      if (lenVal) lenVal.textContent = `${stylometrics.word_count} words`;
+      if (charsVal) charsVal.textContent = `${stylometrics.char_count} chars • ${stylometrics.sentence_count} sentence(s)`;
+      if (punctVal) {
+        const pTotal = stylometrics.exclamations + stylometrics.all_caps_count;
+        punctVal.textContent = pTotal === 0 ? 'Clean' : `${pTotal} flags`;
+        punctVal.style.color = pTotal === 0 ? '#4ade80' : '#f43f5e';
+      }
+    }
+
+    // 3. Highlight Matching Quadrant in the 2x2 Confusion Matrix
+    ['cmCellTN', 'cmCellFP', 'cmCellFN', 'cmCellTP'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('active-claim-quadrant');
+        const badge = el.querySelector('.claim-pinpoint-badge');
+        if (badge) badge.remove();
+      }
+    });
+
+    const activeCellId = 'cmCell' + claimEval.quadrant;
+    const targetCell = document.getElementById(activeCellId);
+    if (targetCell) {
+      targetCell.classList.add('active-claim-quadrant');
+      const badge = document.createElement('div');
+      badge.className = 'claim-pinpoint-badge';
+      badge.innerHTML = '📍 THIS ARTICLE';
+      targetCell.appendChild(badge);
+    }
+
+    // 4. Update Dynamic ROC Operating Point on SVG Curve
+    const rocDot = document.getElementById('claimRocDot');
+    const rocFpr = document.getElementById('rocClaimFpr');
+    const rocTpr = document.getElementById('rocClaimTpr');
+    const rocStatusBadge = document.getElementById('claimRocStatusBadge');
+
+    if (rocDot && claimEval.roc_point) {
+      const fprClamped = Math.min(100, Math.max(0, claimEval.roc_point.fpr));
+      const tprClamped = Math.min(100, Math.max(0, claimEval.roc_point.tpr));
+
+      const cx = 35 + (fprClamped / 100) * 270;
+      const cy = 205 - (tprClamped / 100) * 190;
+
+      rocDot.setAttribute('cx', cx.toFixed(1));
+      rocDot.setAttribute('cy', cy.toFixed(1));
+      rocDot.setAttribute('fill', data.real_probability >= 50 ? '#22c55e' : '#f43f5e');
+
+      if (rocFpr) rocFpr.textContent = `${claimEval.roc_point.fpr}%`;
+      if (rocTpr) rocTpr.textContent = `${claimEval.roc_point.tpr}%`;
+      if (rocStatusBadge) rocStatusBadge.textContent = claimEval.roc_point.status;
+    }
+
+    // 5. Reset Decision Threshold Slider to 0.50 default and sync
+    const slider = document.getElementById('thresholdSlider');
+    if (slider) slider.value = 0.50;
+    updateThresholdSimulation(0.50);
+  }
+
+  // Interactive Decision Cutoff Simulator
+  const thresholdSlider = document.getElementById('thresholdSlider');
+  const sliderValBox = document.getElementById('sliderValBox');
+  const simCutoffLabel = document.getElementById('simCutoffLabel');
+  const simVerdictBadge = document.getElementById('simVerdictBadge');
+  const simMarginVal = document.getElementById('simMarginVal');
+
+  if (thresholdSlider) {
+    thresholdSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      updateThresholdSimulation(val);
+    });
+  }
+
+  function updateThresholdSimulation(tau) {
+    if (sliderValBox) sliderValBox.textContent = `τ = ${tau.toFixed(2)}`;
+    if (simCutoffLabel) simCutoffLabel.textContent = tau.toFixed(2);
+
+    const isReal = currentClaimRealProb >= tau;
+    const margin = Math.round((currentClaimRealProb - tau) * 1000) / 10;
+    const sign = margin >= 0 ? '+' : '';
+
+    if (simVerdictBadge) {
+      simVerdictBadge.textContent = isReal ? 'Real News (Accepted)' : 'Fake / Unverified (Flagged)';
+      simVerdictBadge.style.color = isReal ? '#4ade80' : '#f43f5e';
+    }
+
+    if (simMarginVal) {
+      simMarginVal.textContent = `${sign}${margin}%`;
+      simMarginVal.style.color = margin >= 0 ? '#38bdf8' : '#fb7185';
+    }
+  }
+
+  // Print Verification Dossier
+  const btnPrintReport = document.getElementById('btnPrintReport');
+  if (btnPrintReport) {
+    btnPrintReport.addEventListener('click', () => {
+      window.print();
+    });
   }
 
   function renderFactEvidence(fact) {

@@ -35,11 +35,18 @@
           <span class="brand-badge">Universal 2.0</span>
         </div>
       </div>
-      <div class="nav-actions">
+        <div class="engine-beacon" title="FastAPI Ensemble Active with Live Wikipedia Knowledge Stream" style="margin-right: 0.5rem;">
+          <span class="beacon-dot"></span>
+          <span>Ensemble Online &bull; Wikipedia Live</span>
+        </div>
         <a href="#globalEvaluationSection" class="btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;">
           <span>📊</span>
           <span>Model Evaluation & ROC</span>
         </a>
+        <button type="button" class="btn-secondary" id="btnPrintReport" style="padding: 0.45rem 0.9rem; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem;" title="Print or save verification dossier">
+          <span>🖨️</span>
+          <span>Export Dossier</span>
+        </button>
         <a href="https://github.com/rmaduri0000/VerifAI-Fake-News-Detection" target="_blank" rel="noopener noreferrer" class="btn-github">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
@@ -204,48 +211,77 @@
 
         <!-- Tab 2: Confusion Matrix & ROC Curve -->
         <div class="tab-pane" id="tabConfusionROC">
-          <div style="margin-bottom: 1.25rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.4rem; color: #38bdf8;">
-              Model Evaluation: Confusion Matrix & ROC Curve (Test Set: 7,820 Articles)
-            </h3>
-            <p style="font-size: 0.875rem; color: var(--text-secondary);">
-              Performance on stratified 20% holdout test dataset (3,581 Fake, 4,239 Real) evaluated on the champion Voting Classifier.
-            </p>
+          
+          <!-- Dynamic Claim Locator Banner (Updates on Every News Verification) -->
+          <div class="claim-locator-banner" id="claimLocatorBanner">
+            <div class="locator-title-group">
+              <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.2rem;">
+                📍 Active News Classification Coordinates
+              </div>
+              <h4 id="claimQuadrantTitle" style="color: #4ade80;">
+                <span>🟢</span>
+                <span id="claimQuadrantText">True Positive: Genuine Factual Claim</span>
+              </h4>
+              <p id="claimQuadrantDetail" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                This specific news item successfully cleared ensemble stylometrics and live encyclopedic cross-referencing.
+              </p>
+            </div>
+
+            <div class="locator-metric-badges">
+              <div class="locator-badge">
+                <span>Domain:</span>
+                <strong id="claimDomainText" style="color: #38bdf8;">General News</strong>
+              </div>
+              <div class="locator-badge">
+                <span>Threshold Margin:</span>
+                <strong id="claimMarginText" style="color: #4ade80;">+35.0%</strong>
+              </div>
+              <div class="locator-badge">
+                <span>Likelihood Ratio:</span>
+                <strong id="claimLikelihoodText" style="color: #c084fc;">5.63</strong>
+              </div>
+            </div>
           </div>
 
-          <!-- KPI Cards -->
-          <div class="kpi-badge-grid" id="evalKpiGrid">
-            <div class="kpi-card">
-              <div class="kpi-label">Overall Accuracy</div>
-              <div class="kpi-value" style="color: #4ade80;">99.18%</div>
+          <!-- Forensic Stylometrics & Linguistic Quality Grid -->
+          <div style="margin-bottom: 1.5rem;">
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.5rem;">
+              🔬 Forensic Linguistic Analysis for This Article:
             </div>
-            <div class="kpi-card">
-              <div class="kpi-label">Precision</div>
-              <div class="kpi-value" style="color: #38bdf8;">98.99%</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-label">Recall (Sensitivity)</div>
-              <div class="kpi-value" style="color: #818cf8;">99.50%</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-label">F1-Score</div>
-              <div class="kpi-value" style="color: #c084fc;">99.25%</div>
-            </div>
-            <div class="kpi-card">
-              <div class="kpi-label">ROC AUC</div>
-              <div class="kpi-value" style="color: #fbbf24;">0.9998</div>
+            <div class="forensic-grid">
+              <div class="forensic-card">
+                <div class="forensic-label">Sensationalism Score</div>
+                <div class="forensic-value" id="forensicSensationalism" style="color: #4ade80;">0 / 100</div>
+                <div class="forensic-desc" id="forensicSensationalismDesc">Journalistic, objective rhetoric</div>
+              </div>
+              <div class="forensic-card">
+                <div class="forensic-label">Lexical Diversity</div>
+                <div class="forensic-value" id="forensicTTR" style="color: #38bdf8;">100%</div>
+                <div class="forensic-desc">Type-Token Ratio (unique vocabulary)</div>
+              </div>
+              <div class="forensic-card">
+                <div class="forensic-label">Article Length</div>
+                <div class="forensic-value" id="forensicLength" style="color: #818cf8;">8 words</div>
+                <div class="forensic-desc" id="forensicChars">40 characters &bull; 1 sentence</div>
+              </div>
+              <div class="forensic-card">
+                <div class="forensic-label">Punctuation Style</div>
+                <div class="forensic-value" id="forensicPunctuation" style="color: #c084fc;">Clean</div>
+                <div class="forensic-desc">0 clickbait exclamation/caps marks</div>
+              </div>
             </div>
           </div>
 
-          <!-- Confusion Matrix & ROC Interactive Side-by-Side -->
+          <!-- Side-by-Side: Dynamic Confusion Matrix & Dynamic ROC Curve -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
-            <!-- Interactive Confusion Matrix -->
+            
+            <!-- Dynamic Confusion Matrix with Pinpoint Highlighter -->
             <div class="cm-container">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
                 <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">
-                  📉 Confusion Matrix (Interactive)
+                  📉 Confusion Matrix (Claim Pinpoint Locator)
                 </h4>
-                <span style="font-size: 0.75rem; color: var(--text-muted);">N = 7,820</span>
+                <span style="font-size: 0.75rem; color: #38bdf8; font-weight: 600;">Holdout: 7,820</span>
               </div>
 
               <div class="cm-matrix-wrapper">
@@ -254,45 +290,45 @@
                 <div class="cm-header">Pred Real</div>
 
                 <div class="cm-header vertical">Actual Fake</div>
-                <div class="cm-cell correct-fake" title="True Negative: Fake news correctly detected">
+                <div class="cm-cell correct-fake" id="cmCellTN" title="True Negative: Fake news correctly detected">
                   <span class="cm-cell-count">3,538</span>
-                  <span class="cm-cell-pct">98.80%</span>
+                  <span class="cm-cell-pct">98.80% (TN)</span>
                   <span class="cm-cell-tag">True Negative</span>
                 </div>
-                <div class="cm-cell error-cell" title="False Positive: Fake news misclassified as Real">
+                <div class="cm-cell error-cell" id="cmCellFP" title="False Positive: Fake news misclassified as Real">
                   <span class="cm-cell-count">43</span>
-                  <span class="cm-cell-pct">1.20%</span>
+                  <span class="cm-cell-pct">1.20% (FP)</span>
                   <span class="cm-cell-tag">False Positive</span>
                 </div>
 
                 <div class="cm-header vertical">Actual Real</div>
-                <div class="cm-cell error-cell" title="False Negative: Real news missed as Fake">
+                <div class="cm-cell error-cell" id="cmCellFN" title="False Negative: Real news missed as Fake">
                   <span class="cm-cell-count">21</span>
-                  <span class="cm-cell-pct">0.50%</span>
+                  <span class="cm-cell-pct">0.50% (FN)</span>
                   <span class="cm-cell-tag">False Negative</span>
                 </div>
-                <div class="cm-cell correct-real" title="True Positive: Real news correctly verified">
+                <div class="cm-cell correct-real" id="cmCellTP" title="True Positive: Real news correctly verified">
                   <span class="cm-cell-count">4,218</span>
-                  <span class="cm-cell-pct">99.50%</span>
+                  <span class="cm-cell-pct">99.50% (TP)</span>
                   <span class="cm-cell-tag">True Positive</span>
                 </div>
               </div>
 
               <div style="font-size: 0.8rem; color: var(--text-secondary); text-align: center; margin-top: 0.5rem;">
-                Fake Detection: <strong>98.80%</strong> &bull; Real Detection: <strong>99.50%</strong>
+                Glow box indicates which classification quadrant <strong>this article</strong> falls into.
               </div>
             </div>
 
-            <!-- Interactive ROC Curve Visualizer -->
+            <!-- Dynamic ROC Curve with Moving Operating Point -->
             <div class="roc-chart-wrapper">
               <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 0.8rem;">
                 <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">
-                  📈 ROC Curve (AUC = 0.9998)
+                  📈 ROC Curve & Article Operating Point
                 </h4>
-                <span style="font-size: 0.75rem; color: #4ade80; font-weight: 600;">Near-Perfect</span>
+                <span style="font-size: 0.75rem; color: #4ade80; font-weight: 600;" id="claimRocStatusBadge">AUC: 0.9998</span>
               </div>
 
-              <!-- SVG Visual ROC Curve -->
+              <!-- SVG Visual ROC Curve with Dynamic Pinpoint Dot -->
               <svg class="roc-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
                 <!-- Grid background -->
                 <rect x="35" y="15" width="270" height="190" fill="rgba(15, 23, 42, 0.4)" stroke="rgba(255,255,255,0.06)" rx="4"/>
@@ -302,14 +338,14 @@
                 <!-- 45-degree Chance Diagonal (Random Guessing) -->
                 <line x1="35" y1="205" x2="305" y2="15" stroke="rgba(148, 163, 184, 0.4)" stroke-dasharray="4,4" stroke-width="1.5"/>
 
-                <!-- High-Performance ROC Curve (Steep rise to (0,1) then flat) -->
-                <!-- AUC area fill -->
+                <!-- High-Performance ROC Curve -->
                 <polygon points="35,205 38,20 305,20 305,205" fill="rgba(56, 189, 248, 0.12)"/>
-                <!-- Curve line -->
                 <polyline points="35,205 37,30 45,22 80,20 180,20 305,20" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
 
-                <!-- Operating Point dot (FPR=1.2%, TPR=99.5%) -->
-                <circle cx="39" cy="22" r="5" fill="#f43f5e" stroke="#ffffff" stroke-width="1.5"/>
+                <!-- Dynamic Operating Point dot for this article -->
+                <circle id="claimRocDot" cx="39" cy="22" r="7" fill="#f43f5e" stroke="#ffffff" stroke-width="2">
+                  <animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite"/>
+                </circle>
 
                 <!-- Axes -->
                 <line x1="35" y1="205" x2="305" y2="205" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
@@ -325,14 +361,44 @@
               </svg>
 
               <div class="roc-stats-bar">
-                <div class="roc-stat-item">AUC: <strong>0.9998</strong></div>
-                <div class="roc-stat-item">Sensitivity: <strong>99.50%</strong></div>
-                <div class="roc-stat-item">Specificity: <strong>98.80%</strong></div>
+                <div class="roc-stat-item">Article Operating FPR: <strong id="rocClaimFpr">0.5%</strong></div>
+                <div class="roc-stat-item">Operating TPR: <strong id="rocClaimTpr">85.0%</strong></div>
               </div>
             </div>
           </div>
 
-          <!-- Matplotlib Plot Renderers -->
+          <!-- Interactive Decision Threshold Simulator (Professor Demonstration Mode) -->
+          <div class="threshold-sim-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary);">
+                  🎛️ Interactive Decision Cutoff Simulator (&tau;)
+                </h4>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">
+                  Simulate sensitivity trade-offs: Adjust the probability threshold to see if this article flips between Real and Fake.
+                </p>
+              </div>
+              <div class="slider-val-box" id="sliderValBox">&tau; = 0.50</div>
+            </div>
+
+            <div class="slider-wrapper">
+              <span style="font-size: 0.8rem; color: #f43f5e; font-weight: 600;">0.10 (Aggressive Real)</span>
+              <input type="range" min="0.10" max="0.90" step="0.05" value="0.50" class="custom-range-slider" id="thresholdSlider">
+              <span style="font-size: 0.8rem; color: #22c55e; font-weight: 600;">0.90 (Strict Skeptic)</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; background: rgba(15, 23, 42, 0.4); padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-subtle); margin-top: 0.5rem;">
+              <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                At threshold <span id="simCutoffLabel" style="color: var(--text-primary); font-weight: 600;">0.50</span>, this article is predicted as:
+                <strong id="simVerdictBadge" style="color: #4ade80; font-size: 0.95rem; margin-left: 0.4rem;">Real News</strong>
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-muted);">
+                Distance to decision boundary: <strong id="simMarginVal" style="color: #38bdf8;">+35.0%</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Matplotlib Original Heatmaps (Collapsible Reference) -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
             <div style="background: rgba(10, 14, 24, 0.6); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-subtle);">
               <h5 style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.6rem;">
