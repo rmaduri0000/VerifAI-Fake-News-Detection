@@ -24,12 +24,12 @@ The system also provides:
 
 ## 🛠️ Tech Stack
 
--   **Language**: Python 3.10+
--   **Frontend**: Streamlit
+-   **Frontend**: Modern HTML5, Custom CSS3 (Glassmorphism design system), Vanilla JavaScript (ES6+), Streamlit
+-   **Backend**: FastAPI, Uvicorn, Python 3.10+
 -   **ML Models**: Logistic Regression, Linear SVC (Calibrated), Random Forest (Voting Classifier)
 -   **Feature Extraction**: TF-IDF Vectorizer with NLTK WordNet Lemmatization
 -   **Explainability**: LIME (Local Interpretable Model-agnostic Explanations)
--   **Knowledge Retrieval**: Public Encyclopedic Knowledge REST APIs
+-   **Knowledge Retrieval**: Public Encyclopedic Knowledge REST APIs (Wikipedia)
 
 ---
 
@@ -89,13 +89,19 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-4. **Run the application**
+4. **Run the Application**
 
+### Option A: Modern HTML5 / CSS3 / JavaScript Web App (Recommended)
+```bash
+python -m uvicorn server:app --host 127.0.0.1 --port 8000
+```
+Open **[http://localhost:8000](http://localhost:8000)** in your browser for the full glassmorphism UI with real-time fact checking, animations, and LIME explainability.
+
+### Option B: Streamlit Dashboard
 ```bash
 streamlit run verifai_app.py
 ```
-
-The app will open automatically at `http://localhost:8501`.
+Open **`http://localhost:8501`** for the Streamlit dashboard.
 
 ---
 

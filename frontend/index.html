@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VerifAI — Universal Fake News & Fact Verification Engine</title>
+  <meta name="description" content="VerifAI is an advanced NLP and live fact-checking platform powered by Voting Classifier Machine Learning and real-time knowledge retrieval.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/static/css/index.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+</head>
+<body>
+
+  <!-- Ambient Dynamic Glowing Background -->
+  <div class="ambient-glow" aria-hidden="true">
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+    <div class="glow-orb glow-3"></div>
+  </div>
+
+  <div class="app-container">
+    
+    <!-- Navbar -->
+    <header class="app-navbar">
+      <div class="brand-wrapper">
+        <div class="brand-icon">🧠</div>
+        <div>
+          <span class="brand-title">VerifAI</span>
+          <span class="brand-badge">Universal 2.0</span>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <a href="https://github.com/rmaduri0000/VerifAI-Fake-News-Detection" target="_blank" rel="noopener noreferrer" class="btn-github">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+          </svg>
+          <span>View on GitHub</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <h1 class="hero-heading">Universal News & Fact Verifier</h1>
+      <p class="hero-subtitle">
+        Verify any sports event, historical fact, science claim, or breaking headline. Combining <strong>Live Global Knowledge Retrieval</strong> with <strong>Ensemble Machine Learning</strong>.
+      </p>
+    </section>
+
+    <!-- Main Card Input Form -->
+    <main class="glass-card">
+      
+      <!-- Quick Test Example Chips -->
+      <div class="chips-container">
+        <span class="chips-label">Quick Tests:</span>
+        <button type="button" class="chip-btn" data-text="India won the Cricket World Cup in 2011.">
+          🏏 India 2011 World Cup
+        </button>
+        <button type="button" class="chip-btn" data-text="Argentina won the FIFA World Cup in 2022.">
+          ⚽ Argentina 2022 World Cup
+        </button>
+        <button type="button" class="chip-btn" data-text="The Eiffel Tower is located in Paris, France.">
+          🗼 Eiffel Tower in Paris
+        </button>
+        <button type="button" class="chip-btn" data-text="Stock market hits record high amid strong economic growth.">
+          📈 Record Stock Market
+        </button>
+        <button type="button" class="chip-btn" data-text="SHOCKING: Aliens landed in New York and were captured by military officials!">
+          🛸 Alien Hoax Clickbait
+        </button>
+      </div>
+
+      <!-- Claim Input -->
+      <div class="input-group">
+        <div class="input-label">
+          <label for="titleInput">📰 News Headline or Claim to Verify</label>
+          <span id="charCounter" style="color: var(--text-muted); font-size: 0.8rem;">0 chars</span>
+        </div>
+        <input 
+          type="text" 
+          id="titleInput" 
+          class="text-input" 
+          placeholder="e.g. India won the Cricket World Cup in 2011." 
+          autocomplete="off"
+          required
+        />
+      </div>
+
+      <!-- Optional Context Accordion -->
+      <button type="button" class="accordion-toggle" id="accordionToggle">
+        ▼ Add article context / paragraph (optional)
+      </button>
+
+      <div class="accordion-body" id="accordionBody">
+        <div class="input-group">
+          <div class="input-label">
+            <label for="contextInput">📝 Article Body / Supporting Paragraph</label>
+            <span style="color: var(--text-muted); font-size: 0.75rem;">Improves stylistic NLP precision</span>
+          </div>
+          <textarea 
+            id="contextInput" 
+            class="text-area" 
+            placeholder="Paste a few sentences or full paragraph from the news report..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Settings Bar -->
+      <div class="settings-bar">
+        <div class="toggle-group">
+          <label class="switch-label">
+            <input type="checkbox" id="factCheckSwitch" checked style="accent-color: var(--accent-blue); width: 16px; height: 16px;">
+            <span>🌐 Universal Live Fact-Checking</span>
+          </label>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">MODE:</span>
+          <div class="mode-pills">
+            <button type="button" class="mode-pill active" data-mode="headline" title="Calibrated for short headlines">🎯 Headline Mode</button>
+            <button type="button" class="mode-pill" data-mode="full" title="Standard 50% cutoff for full articles">📄 Full Article</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" id="btnVerify" class="btn-primary">
+          <div class="spinner" id="btnSpinner"></div>
+          <span id="btnText">Verify Claim</span>
+          <span style="font-size: 0.75rem; opacity: 0.7; padding-left: 0.2rem;">(Ctrl + ↵)</span>
+        </button>
+        <button type="button" id="btnClear" class="btn-secondary">
+          🔄 Clear
+        </button>
+      </div>
+
+    </main>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection">
+      
+      <!-- Primary Verdict Hero Card -->
+      <div class="verdict-hero-card" id="verdictCard">
+        <div class="verdict-badge" id="verdictBadge">🟢 Real News (Factually Verified)</div>
+        <div class="verdict-confText" id="verdictConfText" style="font-size: 2.3rem; font-family: var(--font-heading); font-weight: 800; margin-bottom: 0.4rem;">
+          85.0% Confidence
+        </div>
+        <p class="verdict-desc" id="verdictDesc">
+          This claim has been cross-referenced and verified against live encyclopedic knowledge.
+        </p>
+      </div>
+
+      <!-- Dual Credibility Meters -->
+      <div class="meter-grid">
+        <div class="meter-card">
+          <div class="meter-header">
+            <span style="color: #4ade80;">🟢 Real Credibility</span>
+            <span id="realMetricValue" style="color: #4ade80; font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700;">85.0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill real" id="realProgressFill" style="width: 85%;"></div>
+          </div>
+        </div>
+
+        <div class="meter-card">
+          <div class="meter-header">
+            <span style="color: #fb7185;">🔴 Fake / Clickbait Risk</span>
+            <span id="fakeMetricValue" style="color: #fb7185; font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700;">15.0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill fake" id="fakeProgressFill" style="width: 15%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deep Analysis Tabs -->
+      <div class="glass-card" style="padding: 1.5rem;">
+        
+        <nav class="tab-navigation">
+          <button type="button" class="tab-btn active" data-tab="tabFact">🌐 Live Fact Evidence</button>
+          <button type="button" class="tab-btn" data-tab="tabML">🧠 ML Vocabulary Signals</button>
+          <button type="button" class="tab-btn" data-tab="tabLIME">🧪 LIME Feature Heatmap</button>
+          <button type="button" class="tab-btn" data-tab="tabBenchmark">📊 Model Benchmarks</button>
+        </nav>
+
+        <!-- Tab 1: Fact Evidence -->
+        <div class="tab-pane active" id="tabFact">
+          <div id="factEvidenceContainer">
+            <!-- Fact details will load dynamically -->
+          </div>
+        </div>
+
+        <!-- Tab 2: ML Signals -->
+        <div class="tab-pane" id="tabML">
+          <div style="margin-bottom: 1rem;">
+            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.4rem;">
+              Recognized Training Terms (TF-IDF):
+            </div>
+            <div id="recognizedTokensList"></div>
+          </div>
+
+          <div style="margin-bottom: 1.25rem;">
+            <div style="font-size: 0.85rem; font-weight: 600; color: #fde68a; margin-bottom: 0.4rem;">
+              Out-of-Domain Words (Verified via Live Knowledge Engine):
+            </div>
+            <div id="oovTokensList"></div>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 0.8rem;" id="rawStatsContainer"></div>
+        </div>
+
+        <!-- Tab 3: LIME Feature Heatmap -->
+        <div class="tab-pane" id="tabLIME">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">
+              Inspect word-by-word positive/negative contributions to stylistic credibility:
+            </p>
+            <button type="button" class="btn-secondary" id="btnFetchLime" style="padding: 0.4rem 0.9rem; font-size: 0.85rem;">
+              <span class="spinner" id="limeSpinner" style="width: 14px; height: 14px; margin-right: 4px;"></span>
+              Generate Word Weights
+            </button>
+          </div>
+          <div class="lime-container" id="limeContainer">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Click the button above to generate deep linguistic feature importance using LIME.</p>
+          </div>
+        </div>
+
+        <!-- Tab 4: Benchmark -->
+        <div class="tab-pane" id="tabBenchmark">
+          <div id="metricsSummary"></div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+            <div>
+              <h4 style="font-size: 0.95rem; margin-bottom: 0.6rem; color: var(--text-secondary);">Confusion Matrix</h4>
+              <img src="/static/assets/confusion_matrix.png" alt="Confusion Matrix" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-subtle);" onerror="this.style.display='none'">
+            </div>
+            <div>
+              <h4 style="font-size: 0.95rem; margin-bottom: 0.6rem; color: var(--text-secondary);">ROC Curve</h4>
+              <img src="/static/assets/roc_curve.png" alt="ROC Curve" style="width: 100%; border-radius: 8px; border: 1px solid var(--border-subtle);" onerror="this.style.display='none'">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem;">
+      <div>
+        <strong>VerifAI</strong> &bull; Universal Fact & News Verification Engine
+      </div>
+      <div>
+        Created by <a href="https://github.com/rmaduri0000" target="_blank" rel="noopener noreferrer">Rajashekhar Maduri (@rmaduri0000)</a> &bull;
+        <a href="https://github.com/rmaduri0000/VerifAI-Fake-News-Detection" target="_blank" rel="noopener noreferrer">Source Code on GitHub ↗</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
